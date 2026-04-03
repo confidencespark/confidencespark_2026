@@ -1,0 +1,57 @@
+buildscript {
+    ext {
+        buildToolsVersion = "36.0.0"
+        minSdkVersion = 24
+        compileSdkVersion = 36
+        targetSdkVersion = 36
+        ndkVersion = "27.1.12297006"
+        kotlinVersion = "2.1.20"
+        androidGradlePluginVersion = "8.11.0"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:$androidGradlePluginVersion")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    }
+}
+
+// Force all subprojects (native modules) to use the same AGP version to fix "No variants exist"
+allprojects {
+    buildscript {
+        configurations.classpath.resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.tools.build' && details.requested.name == 'gradle') {
+                details.useVersion rootProject.ext.androidGradlePluginVersion
+                details.because 'Unify AGP version for React Native variant compatibility'
+            }
+        }
+    }
+}
+
+// Windows: use ninja wrapper with -d keepdepfile to fix "deleting depfile: Permission denied".
+// Wrapper skips keepdepfile for -t (restat) to avoid "failed recompaction: Permission denied".
+def isWindows = org.gradle.internal.os.OperatingSystem.current().isWindows()
+if (isWindows) {
+    def ninjaWrapper = file("${rootProject.projectDir}/../scripts/ninja-wrapper.bat").absolutePath.replace('\\', '/')
+    def cmakeArg = "-DCMAKE_MAKE_PROGRAM=${ninjaWrapper}".toString()
+    allprojects { project ->
+        project.afterEvaluate {
+            if (project.extensions.findByName('android')) {
+                def android = project.android
+                if (android.defaultConfig?.externalNativeBuild?.cmake?.arguments != null) {
+                    android.defaultConfig.externalNativeBuild.cmake.arguments.add(cmakeArg)
+                }
+                android.buildTypes?.each { bt ->
+                    if (bt.externalNativeBuild?.cmake?.arguments != null) {
+                        bt.externalNativeBuild.cmake.arguments.add(cmakeArg)
+                    }
+                }
+            }
+        }
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"

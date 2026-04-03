@@ -1,0 +1,184 @@
+# --- OS / Editor ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+.directory
+.Trash-*
+.fuse_hidden*
+.nfs*
+.vscode/
+.idea/
+*.swp
+*.swo
+
+.env.local
+.env
+
+
+# --- Logs ---
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# --- Node / Tooling ---
+node_modules/
+bower_components
+jspm_packages/
+web_modules/
+.lock-wscript
+build/Release
+.rpt2_cache/
+.rts2_cache_*
+.node_repl_history
+*.tgz
+.yarn-integrity
+.cache
+.parcel-cache
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.pnp.*
+
+# --- Env / Secrets ---
+.env
+.env.local
+.env.*.local
+
+# --- TypeScript / ESLint / Stylelint caches ---
+*.tsbuildinfo
+.npm
+.eslintcache
+.stylelintcache
+
+# --- Coverage ---
+coverage/
+*.lcov
+.nyc_output
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# --- React Native / Metro ---
+.expo
+__generated__
+.metro/
+metro-cache/
+dist/
+
+# --- Watchman ---
+.watchman/
+
+# --- Android ---
+# Gradle and build outputs
+android/.gradle/
+android/build/
+android/app/build/
+android/**/build
+.gradle/
+**/build/
+!src/**/build/            # keep generated sources inside src if any
+
+# Local config
+android/local.properties
+local.properties
+
+# Android Studio / IntelliJ
+android/.idea/
+*.iml
+captures/
+.externalNativeBuild/
+.cxx/
+output.json
+deploymentTargetDropDown.xml
+render.experimental.xml
+misc.xml
+
+# Packages / Artifacts
+*.apk
+*.aab
+
+# Keystores (NEVER COMMIT SECRETS)
+*.jks
+*.keystore
+android/key.properties
+
+# Google Services (Firebase)
+google-services.json
+
+# Profiling
+*.hprof
+
+# --- Gradle wrapper (keep) ---
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+gradle-app.setting
+.gradletasknamecache
+
+# --- iOS / Xcode ---
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+*.xcuserstate
+
+# SwiftPM
+ios/.swiftpm/
+ios/Package.resolved
+
+# CocoaPods (optional: remove this line if you choose to commit Pods)
+ios/Pods/
+
+# Apple artifacts / distribution (never commit)
+*.ipa
+*.mobileprovision
+*.p12
+*.pem
+
+# --- Buck ---
+buck-out/
+.buckconfig.local
+.buckd/
+.buckversion
+.fakebuckversion
+
+# --- Web frameworks (only if present) ---
+.next
+out
+.nuxt
+.vuepress/dist
+.temp
+.docusaurus
+
+# --- Fastlane ---
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+
+# --- Misc temp ---
+tmp/
+temp/
