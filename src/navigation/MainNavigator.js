@@ -72,5 +72,5 @@ const MainNavigator = () => {
     </Stack.Navigator>
   );
 };
-
+//MainNavigator
 export default MainNavigator;
