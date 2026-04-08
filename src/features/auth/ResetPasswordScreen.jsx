@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_TITLE,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#111827',
     marginTop: DIMENSIONS.verticalScale(6),
   },
@@ -268,13 +268,13 @@ const styles = StyleSheet.create({
   btnText: {
     color: '#FFFFFF',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
-    fontWeight: '700',
+    fontWeight: '500',
   },
 
   backWrap: {alignItems: 'center', marginTop: DIMENSIONS.verticalScale(14)},
   backLink: {
     color: '#2E6C94',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
   },
 });

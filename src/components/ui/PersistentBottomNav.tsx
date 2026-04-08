@@ -159,7 +159,7 @@ export function PersistentBottomNav({
         {/* Back */}
         {showBack ? (
           <NavButton
-            icon="chevron-back"
+            icon="arrow-back"
             onPress={handleBack}
             variant="default"
           />
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   primaryLabel: {
     color: '#fff',
-    fontWeight: '700',
+    fontWeight: '500',
     fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
   },
 });

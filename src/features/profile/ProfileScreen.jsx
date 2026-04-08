@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: '500',
     color: COLORS.text,
     marginLeft: 4,
   },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
   },
 
   formGroup: {marginTop: 20},
-  label: {fontSize: 13, fontWeight: '600', color: COLORS.text, marginBottom: 6},
+  label: {fontSize: 13, fontWeight: '400', color: COLORS.text, marginBottom: 6},
   input: {
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -363,8 +363,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 10,
   },
-  linkText: {color: COLORS.primary, fontSize: 16, fontWeight: '600'},
-  deleteText: {color: COLORS.danger, fontSize: 16, fontWeight: '600'},
+  linkText: {color: COLORS.primary, fontSize: 16, fontWeight: '400'},
+  deleteText: {color: COLORS.danger, fontSize: 16, fontWeight: '400'},
 
   /* Modal */
   modalBackdrop: {
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '800',
+    fontWeight: '500',
     color: COLORS.text,
     textAlign: 'center',
   },
@@ -418,7 +418,7 @@ const styles = StyleSheet.create({
     minWidth: 100,
     alignItems: 'center',
   },
-  btnText: {fontWeight: '700', fontSize: 15},
+  btnText: {fontWeight: '500', fontSize: 15},
   btnOutline: {
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
   blockerText: {
     color: '#fff',
     marginTop: 10,
-    fontWeight: '700',
+    fontWeight: '500',
     fontSize: 16,
   },
 });

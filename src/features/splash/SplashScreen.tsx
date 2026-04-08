@@ -73,7 +73,7 @@ const SplashScreen: FC = () => {
       />
       {/* <StatusBar hidden={Platform.OS !== 'android'} /> */}
       <ImageBackground
-        source={require('@assets/images/splash.png')}
+        source={require('@assets/images/splash.jpg')}
         style={styles.backgroundImage}
         resizeMode="cover">
         <LinearGradient

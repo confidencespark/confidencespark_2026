@@ -15,18 +15,22 @@ import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import CurvedHeader from '@components/ui/CurvedHeader';
-import {PersistentBottomNav, PERSISTENT_NAV_HEIGHT} from '@components/ui/PersistentBottomNav';
 import {FadeInView} from '@components/ui/FadeInView';
 import {DIMENSIONS} from '@constants/dimensions';
 import {navigate} from '@utils/NavigationUtils';
-import {useEditSituationMutation} from '@store/api/confidenceApi';
+import {
+  useEditSituationMutation,
+  useConfidenceLookupMutation,
+} from '@store/api/confidenceApi';
+import {navigateToConfidenceStepFlow} from '@utils/confidenceStepFlow';
 
 const H_1 = require('@assets/images/h_1.webp');
-const H_2 = require('@assets/images/h_2.webp');
-const H_3 = require('@assets/images/h_3.webp');
-const H_4 = require('@assets/images/h_4.webp');
-const H_5 = require('@assets/images/h_5.webp');
-const H_6 = require('@assets/images/h_6.webp');
+const H_2 = require('@assets/images/h_2.jpg');
+const H_3 = require('@assets/images/h_3.jpg');
+const H_4 = require('@assets/images/h_4.jpg');
+const H_5 = require('@assets/images/h_5.jpg');
+const H_6 = require('@assets/images/h_6.jpg');
+const H_7 = require('@assets/images/h_7.jpg');
 
 const SITUATIONS = [
   {
@@ -34,7 +38,6 @@ const SITUATIONS = [
     title: 'Just Give Me a Daily Boost',
     sub: "You're not here to impress. You’re here to connect.",
     image: H_1,
-    redirect: 'LookupScreen',
   },
   {
     key: 'pitch',
@@ -75,7 +78,7 @@ const SITUATIONS = [
     key: 'difficult',
     title: 'Difficult Conversations',
     sub: 'Meet it with steadiness, clarity, and respect.',
-    image: H_4,
+    image: H_7,
     redirect: 'ConfirmSituationScreen',
   },
 ];
@@ -92,6 +95,7 @@ const SITUATIONS = [
 export default function HomeScreen({navigation}) {
   const insets = useSafeAreaInsets();
   const [editSituation, {isLoading}] = useEditSituationMutation();
+  const [confidenceLookup] = useConfidenceLookupMutation();
   const [showFullLoader, setShowFullLoader] = useState(true);
 
   const frozenBottom = React.useRef(insets.bottom || 0).current;
@@ -107,9 +111,16 @@ export default function HomeScreen({navigation}) {
         await editSituation(body).unwrap();
       } catch (error) {
         console.log('editSituation (offline)', error);
+      }
+      try {
+        const unwrapLookup = body => confidenceLookup(body).unwrap();
+        await navigateToConfidenceStepFlow(unwrapLookup, 'daily', 'any');
+      } catch (e) {
+        console.log('daily step flow', e);
       } finally {
         setShowFullLoader(false);
       }
+      return;
     }
     navigate('Main', {
       screen: item.redirect,
@@ -118,9 +129,6 @@ export default function HomeScreen({navigation}) {
         title: item.title,
         subtitle: item.sub,
         image: item?.image,
-        ...(item.key === 'daily'
-          ? {situation_key: 'daily', vibe_key: 'any'}
-          : {}),
       },
     });
   };
@@ -149,7 +157,7 @@ export default function HomeScreen({navigation}) {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
           paddingHorizontal: DIMENSIONS.PADDING_HORIZONTAL,
-          paddingBottom: frozenBottom + PERSISTENT_NAV_HEIGHT + DIMENSIONS.verticalScale(24),
+          paddingBottom: frozenBottom + DIMENSIONS.verticalScale(24),
         }}
         showsVerticalScrollIndicator={false}>
         <View style={{height: DIMENSIONS.verticalScale(6)}} />
@@ -182,11 +190,6 @@ export default function HomeScreen({navigation}) {
           </FadeInView>
         ))}
       </ScrollView>
-
-      <PersistentBottomNav
-        navigation={navigation}
-        showNext={false}
-      />
 
       {/* FULL-SCREEN LOADER (replaces skeletons) */}
       {showFullLoader && (
@@ -240,7 +243,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: DIMENSIONS.FONT_SIZE_LARGE,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#111827',
     marginBottom: DIMENSIONS.verticalScale(4),
   },
@@ -267,7 +270,7 @@ const styles = StyleSheet.create({
   blockerText: {
     color: '#fff',
     marginTop: 10,
-    fontWeight: '700',
+    fontWeight: '500',
     fontSize: 16,
   },
 });

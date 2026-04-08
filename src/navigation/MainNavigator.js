@@ -4,8 +4,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import IntroScreen from '@features/intro/IntroScreen';
 import MoodSelectScreen from '@features/main/MoodSelectScreen';
 import ConfirmSituationScreen from '@features/main/ConfirmSituationScreen';
-import ConfirmVibeScreen from '@features/main/ConfirmVibeScreen';
-import LookupScreen from '@features/main/LookupScreen';
 import StepFlowScreen from '@features/main/StepFlowScreen';
 import HomeScreen from '@features/main/home/HomeScreen';
 
@@ -52,25 +50,11 @@ const MainNavigator = () => {
         options={{
           animation: 'fade',
         }}
-        name="ConfirmVibeScreen"
-        component={ConfirmVibeScreen}
-      />
-      <Stack.Screen
-        options={{
-          animation: 'fade',
-        }}
-        name="LookupScreen"
-        component={LookupScreen}
-      />
-      <Stack.Screen
-        options={{
-          animation: 'fade',
-        }}
         name="StepFlowScreen"
         component={StepFlowScreen}
       />
     </Stack.Navigator>
   );
 };
-//MainNavigator
+
 export default MainNavigator;

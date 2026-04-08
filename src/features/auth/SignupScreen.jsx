@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_TITLE,
-    fontWeight: '800',
+    fontWeight: '600',
     color: '#111827',
     marginBottom: DIMENSIONS.verticalScale(12),
     marginTop: DIMENSIONS.verticalScale(8),
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   btnText: {
     color: '#FFFFFF',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
-    fontWeight: '700',
+    fontWeight: '500',
   },
 
   footer: {
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
   },
   footerLink: {
     color: '#2E6C94',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
   },
 });

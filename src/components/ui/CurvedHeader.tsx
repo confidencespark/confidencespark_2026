@@ -69,7 +69,7 @@ const CurvedBackground = ({text}) => {
 const styles = StyleSheet.create({
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_TITLE,
-    fontWeight: '800',
+    fontWeight: '600',
     color: COLORS.white,
     marginTop: DIMENSIONS.verticalScale(6),
   },

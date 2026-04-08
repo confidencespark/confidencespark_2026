@@ -21,7 +21,7 @@ import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import {DIMENSIONS} from '@constants/dimensions';
 import {resetAndNavigate} from '@utils/NavigationUtils';
 import {PersistentBottomNav, PERSISTENT_NAV_HEIGHT} from '@components/ui/PersistentBottomNav';
-import AudioWaveformLine from '@components/ui/AudioWaveformLine';
+import FadeUpSentencesText from '@components/ui/FadeUpSentencesText';
 
 // ------- assets -------
 const HERO_FALLBACK = {
@@ -35,50 +35,32 @@ const AnimatedImageBackground =
 
 // min overlay time so the transition feels intentional
 const MIN_LOADER_MS = 300; // set 200–400 to taste
-const HERO_LOAD_TIMEOUT_MS = 5000; // don't block forever if hero image fails to load
-const AUDIO_PULSE_MS = 2400;
+/** Only if hero never fires onLoad/onLoadEnd (broken network / bad URL) */
+const HERO_STUCK_FALLBACK_MS = 60000;
 
-function buildAudioPulseLoop(scaleAnim, opacityAnim) {
-  return Animated.loop(
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(scaleAnim, {
-          toValue: 2.38,
-          duration: AUDIO_PULSE_MS,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 0,
-          duration: AUDIO_PULSE_MS,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacityAnim, {
-          toValue: 0.42,
-          duration: 0,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]),
-  );
-}
+/** Breathing glow behind play button (fixed radius; opacity only) */
+const GLOW_OPACITY_MIN = 0.01;
+const GLOW_OPACITY_MAX = 0.45;
+const GLOW_BREATH_HALF_MS = 2200;
+const GLOW_FADE_OUT_MS = 510;
+
+/** Subtle L/R “music” bars beside play (secondary to glow); height 0–1 → px */
+const EQ_BAR_COUNT = 10;
+const EQ_SETTLE_MS = 1000;
+const EQ_OPACITY = 0.4;
+const EQ_BAR_WIDTH = 4;
+const EQ_BAR_GAP = 4;
+const EQ_HALF_MS = 1050;
+const EQ_BAR_MAX_PX = DIMENSIONS.moderateScale(18);
 
 /**
  * Step Flow Screen (The Core Experience)
  *
- * Guides the user through the 5-step confidence routine.
+ * Guides the user through the 6-step confidence routine.
  *
  * Features:
  * - Dynamic Hero Images: Smooth transitions/preloading between step images.
- * - Audio Playback: Integrated player for the guided voiceover (Mantra step).
+ * - Audio Playback: Integrated player for the guided voiceover (Mantra step only).
  * - Step Navigation: Next/Back logic with index tracking.
  * - Completion: Returns to Home or designated finish route on end.
  */
@@ -96,7 +78,6 @@ export default function StepFlowScreen({navigation, route}) {
   const [index, setIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
-  const [waveformWidth, setWaveformWidth] = useState(0);
 
   // ---- hero/state for no-flicker swap ----
   const [displayedHero, setDisplayedHero] = useState(
@@ -109,7 +90,6 @@ export default function StepFlowScreen({navigation, route}) {
   const [pendingIndex, setPendingIndex] = useState(null);
   const [isBlocking, setIsBlocking] = useState(true);
   const loaderStartRef = useRef(null);
-  const heroLoadTimeoutRef = useRef(null);
 
   // ---- audio setup (unchanged) ----
   const playerRef = useRef(AudioRecorderPlayer).current;
@@ -122,17 +102,17 @@ export default function StepFlowScreen({navigation, route}) {
 
   // subtle content fade
   const contentAnim = useRef(new Animated.Value(1)).current;
-  /** Outer pulse rings while audio plays (staggered loops; button stays scale 1) */
-  const pulseRingScale = useRef(new Animated.Value(1)).current;
-  const pulseRingOpacity = useRef(new Animated.Value(0)).current;
-  const pulseRingScale2 = useRef(new Animated.Value(1)).current;
-  const pulseRingOpacity2 = useRef(new Animated.Value(0)).current;
-  const pulseLoopRef = useRef(null);
-  const pulseLoopRef2 = useRef(null);
-  const pulseStaggerTimerRef = useRef(null);
-  /** One-shot ripple on each Play press */
-  const clickRippleScale = useRef(new Animated.Value(1)).current;
-  const clickRippleOpacity = useRef(new Animated.Value(0)).current;
+  const glowOpacity = useRef(new Animated.Value(0)).current;
+  const glowLoopRef = useRef(null);
+
+  const eqBarValuesRef = useRef(null);
+  if (!eqBarValuesRef.current) {
+    eqBarValuesRef.current = Array.from(
+      {length: EQ_BAR_COUNT},
+      () => new Animated.Value(0),
+    );
+  }
+  const eqBarLoopRef = useRef(null);
 
   const step = steps[index] || {};
   const stepHero = displayedHero || HERO_FALLBACK.uri;
@@ -167,7 +147,36 @@ export default function StepFlowScreen({navigation, route}) {
     }
   };
 
+  const stopEqBarLoopOnly = useCallback(() => {
+    if (eqBarLoopRef.current) {
+      eqBarLoopRef.current.stop();
+      eqBarLoopRef.current = null;
+    }
+  }, []);
+
+  const stopEqBarsImmediate = useCallback(() => {
+    stopEqBarLoopOnly();
+    eqBarValuesRef.current.forEach(v => v.setValue(0));
+  }, [stopEqBarLoopOnly]);
+
+  const settleEqBarsToZero = useCallback(() => {
+    stopEqBarLoopOnly();
+    const bars = eqBarValuesRef.current;
+    Animated.parallel(
+      bars.map(v =>
+        Animated.timing(v, {
+          toValue: 0,
+          duration: EQ_SETTLE_MS,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: false,
+        }),
+      ),
+    ).start();
+  }, [stopEqBarLoopOnly]);
+
   const onNaturalEnd = async () => {
+    settleEqBarsToZero();
+    setIsPlaying(false);
     try {
       await playerRef.stopPlayer();
     } catch {}
@@ -180,7 +189,6 @@ export default function StepFlowScreen({navigation, route}) {
     durationRef.current = 0;
     endedRef.current = true;
     clearEndTimer();
-    setIsPlaying(false);
   };
 
   const scheduleEndGuard = () => {
@@ -195,6 +203,7 @@ export default function StepFlowScreen({navigation, route}) {
 
   const stopAndRelease = useCallback(async () => {
     clearEndTimer();
+    stopEqBarsImmediate();
     try {
       await playerRef.stopPlayer();
     } catch {}
@@ -207,11 +216,12 @@ export default function StepFlowScreen({navigation, route}) {
     durationRef.current = 0;
     endedRef.current = false;
     setIsPlaying(false);
-  }, [playerRef]);
+  }, [playerRef, stopEqBarsImmediate]);
 
   const pausePlayback = async () => {
     clearEndTimer();
     await playerRef.pausePlayer();
+    settleEqBarsToZero();
     pausedRef.current = true;
     setIsPlaying(false);
   };
@@ -262,32 +272,12 @@ export default function StepFlowScreen({navigation, route}) {
     if (durationRef.current > 0) scheduleEndGuard();
   };
 
-  const triggerPlayClickRipple = () => {
-    clickRippleScale.setValue(0.92);
-    clickRippleOpacity.setValue(0.62);
-    Animated.parallel([
-      Animated.timing(clickRippleScale, {
-        toValue: 2.35,
-        duration: 520,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(clickRippleOpacity, {
-        toValue: 0,
-        duration: 520,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
   const handlePlayPress = async () => {
     if (!audio) return;
     if (isPlaying) {
       await pausePlayback();
       return;
     }
-    triggerPlayClickRipple();
     if (hasStartedRef.current && pausedRef.current) {
       await resumePlayback(audio);
     } else {
@@ -295,77 +285,83 @@ export default function StepFlowScreen({navigation, route}) {
     }
   };
 
-  // Soft outer rings: two staggered loops so waves overlap smoothly
+  // Fixed-radius breathing glow: only while playing and not buffering
   React.useEffect(() => {
-    if (!isPlaying) {
-      if (pulseStaggerTimerRef.current) {
-        clearTimeout(pulseStaggerTimerRef.current);
-        pulseStaggerTimerRef.current = null;
-      }
-      if (pulseLoopRef.current) {
-        pulseLoopRef.current.stop();
-        pulseLoopRef.current = null;
-      }
-      if (pulseLoopRef2.current) {
-        pulseLoopRef2.current.stop();
-        pulseLoopRef2.current = null;
-      }
-      Animated.timing(pulseRingScale, {
-        toValue: 1,
-        duration: 220,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }).start();
-      Animated.timing(pulseRingOpacity, {
+    const shouldGlow = isPlaying && !isLoadingAudio;
+
+    if (glowLoopRef.current) {
+      glowLoopRef.current.stop();
+      glowLoopRef.current = null;
+    }
+
+    if (!shouldGlow) {
+      Animated.timing(glowOpacity, {
         toValue: 0,
-        duration: 220,
-        useNativeDriver: true,
-      }).start();
-      Animated.timing(pulseRingScale2, {
-        toValue: 1,
-        duration: 220,
+        duration: GLOW_FADE_OUT_MS,
         easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }).start();
-      Animated.timing(pulseRingOpacity2, {
-        toValue: 0,
-        duration: 220,
         useNativeDriver: true,
       }).start();
       return;
     }
-    pulseRingScale.setValue(1);
-    pulseRingOpacity.setValue(0.42);
-    pulseRingScale2.setValue(1);
-    pulseRingOpacity2.setValue(0.42);
 
-    pulseLoopRef.current = buildAudioPulseLoop(pulseRingScale, pulseRingOpacity);
-    pulseLoopRef.current.start();
-
-    pulseStaggerTimerRef.current = setTimeout(() => {
-      pulseStaggerTimerRef.current = null;
-      pulseLoopRef2.current = buildAudioPulseLoop(
-        pulseRingScale2,
-        pulseRingOpacity2,
-      );
-      pulseLoopRef2.current.start();
-    }, Math.floor(AUDIO_PULSE_MS / 2));
+    glowOpacity.setValue(GLOW_OPACITY_MIN);
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowOpacity, {
+          toValue: GLOW_OPACITY_MAX,
+          duration: GLOW_BREATH_HALF_MS,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowOpacity, {
+          toValue: GLOW_OPACITY_MIN,
+          duration: GLOW_BREATH_HALF_MS,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    glowLoopRef.current = loop;
+    loop.start();
 
     return () => {
-      if (pulseStaggerTimerRef.current) {
-        clearTimeout(pulseStaggerTimerRef.current);
-        pulseStaggerTimerRef.current = null;
-      }
-      if (pulseLoopRef.current) {
-        pulseLoopRef.current.stop();
-        pulseLoopRef.current = null;
-      }
-      if (pulseLoopRef2.current) {
-        pulseLoopRef2.current.stop();
-        pulseLoopRef2.current = null;
+      if (glowLoopRef.current) {
+        glowLoopRef.current.stop();
+        glowLoopRef.current = null;
       }
     };
-  }, [isPlaying]);
+  }, [isPlaying, isLoadingAudio]);
+
+  // Subtle L/R EQ bars beside play: slow sine-like loop while playing
+  React.useEffect(() => {
+    if (!isPlaying || isLoadingAudio) return undefined;
+    const bars = eqBarValuesRef.current;
+    const loops = bars.map((v, i) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(v, {
+            toValue: 1,
+            duration: EQ_HALF_MS + i * 90,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: false,
+          }),
+          Animated.timing(v, {
+            toValue: 0,
+            duration: EQ_HALF_MS + i * 90,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: false,
+          }),
+        ]),
+      ),
+    );
+    const main = Animated.parallel(loops);
+    main.start();
+    eqBarLoopRef.current = main;
+    return () => {
+      main.stop();
+      eqBarLoopRef.current = null;
+    };
+  }, [isPlaying, isLoadingAudio]);
 
   const isLast = index >= (steps?.length || 1) - 1;
 
@@ -373,18 +369,42 @@ export default function StepFlowScreen({navigation, route}) {
   const goToStep = nextIdx => {
     if (nextIdx === index || isBlocking) return;
 
+    if (
+      steps[index]?.key === 'mantra' &&
+      steps[nextIdx]?.key !== 'mantra'
+    ) {
+      void stopAndRelease();
+    }
+
     const nextHero =
       steps[nextIdx]?.hero || steps[nextIdx]?.image || hero?.uri || hero;
+
+    // Already showing this URI — no decode wait; still respect min loader + fade
+    if (nextHero === displayedHero) {
+      loaderStartRef.current = Date.now();
+      setIsBlocking(true);
+      contentAnim.setValue(0);
+      finishAfterMinDuration(() => {
+        setIndex(nextIdx);
+        setPendingIndex(null);
+        setIncomingHero(null);
+        setIsBlocking(false);
+        Animated.timing(contentAnim, {
+          toValue: 1,
+          duration: 160,
+          useNativeDriver: true,
+        }).start();
+      });
+      return;
+    }
 
     loaderStartRef.current = Date.now();
     setIsBlocking(true);
     setPendingIndex(nextIdx);
     setIncomingHero(nextHero);
 
-    // hint cache
     if (nextHero) Image.prefetch(nextHero);
 
-    // fade out content under overlay (optional)
     contentAnim.setValue(0);
   };
 
@@ -416,20 +436,21 @@ export default function StepFlowScreen({navigation, route}) {
       });
   }, [steps]);
 
-  // safety: if hero never loads, don't block user forever
+  // Rare fallback: hero callbacks never fire (network / bad URL) — abandon pending step change
   React.useEffect(() => {
-    if (!isBlocking) return;
-    heroLoadTimeoutRef.current = setTimeout(() => {
+    if (!isBlocking) return undefined;
+    const id = setTimeout(() => {
+      setIncomingHero(null);
+      setPendingIndex(null);
       setIsBlocking(false);
-      heroLoadTimeoutRef.current = null;
-    }, HERO_LOAD_TIMEOUT_MS);
-    return () => {
-      if (heroLoadTimeoutRef.current) {
-        clearTimeout(heroLoadTimeoutRef.current);
-        heroLoadTimeoutRef.current = null;
-      }
-    };
-  }, [isBlocking]);
+      Animated.timing(contentAnim, {
+        toValue: 1,
+        duration: 160,
+        useNativeDriver: true,
+      }).start();
+    }, HERO_STUCK_FALLBACK_MS);
+    return () => clearTimeout(id);
+  }, [isBlocking, contentAnim]);
 
   const finishAfterMinDuration = fn => {
     const elapsed = Date.now() - (loaderStartRef.current || 0);
@@ -439,6 +460,15 @@ export default function StepFlowScreen({navigation, route}) {
       loaderStartRef.current = null;
     }, wait);
   };
+
+  /**
+   * Initial / static hero only. While `incomingHero` preloads the next step, the visible
+   * ImageBackground still shows the previous URI — ignore its load events until preload finishes.
+   */
+  const onPrimaryHeroReady = useCallback(() => {
+    if (incomingHero) return;
+    setIsBlocking(false);
+  }, [incomingHero]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
@@ -456,16 +486,8 @@ export default function StepFlowScreen({navigation, route}) {
           imageStyle={styles.heroImageNoRadius}
           resizeMode="cover"
           fadeDuration={0} // <-- remove Android default 300ms fade
-          // onLoad={() => {
-          //   setIsBlocking(true);
-          // }}
-          onLoadEnd={() => {
-            if (heroLoadTimeoutRef.current) {
-              clearTimeout(heroLoadTimeoutRef.current);
-              heroLoadTimeoutRef.current = null;
-            }
-            setIsBlocking(false);
-          }}>
+          onLoad={onPrimaryHeroReady}
+          onLoadEnd={onPrimaryHeroReady}>
           <LinearGradient
             colors={['rgba(0,0,0,0.35)', 'rgba(0,0,0,0.15)']}
             style={StyleSheet.absoluteFill}
@@ -479,12 +501,8 @@ export default function StepFlowScreen({navigation, route}) {
             resizeMode="cover"
             fadeDuration={0}
             style={styles.preloaderFull} // full width & HERO_H height
-            onLoad={() => {
+            onLoadEnd={() => {
               finishAfterMinDuration(() => {
-                if (heroLoadTimeoutRef.current) {
-                  clearTimeout(heroLoadTimeoutRef.current);
-                  heroLoadTimeoutRef.current = null;
-                }
                 setDisplayedHero(incomingHero);
                 if (typeof pendingIndex === 'number') setIndex(pendingIndex);
                 setPendingIndex(null);
@@ -498,12 +516,7 @@ export default function StepFlowScreen({navigation, route}) {
               });
             }}
             onError={() => {
-              // advance anyway after min time; keep old hero
               finishAfterMinDuration(() => {
-                if (heroLoadTimeoutRef.current) {
-                  clearTimeout(heroLoadTimeoutRef.current);
-                  heroLoadTimeoutRef.current = null;
-                }
                 if (typeof pendingIndex === 'number') setIndex(pendingIndex);
                 setPendingIndex(null);
                 setIncomingHero(null);
@@ -531,13 +544,35 @@ export default function StepFlowScreen({navigation, route}) {
                 Step {Math.min(index + 1, steps.length || 1)}
               </Text>
               <Text style={styles.stepTitle}>{step?.title || '—'}</Text>
-              <Text style={styles.stepText}>
-                {step?.text || 'Text to show'}
-              </Text>
+              <View style={styles.stepTextOuter}>
+                <FadeUpSentencesText
+                  text={step?.text || ''}
+                  textStyle={styles.stepText}
+                  animateKey={index}
+                />
+              </View>
 
-              {/* play + minimalist waveform (step 1 / Mantra only) */}
-              {index === 0 && (
+              {/* play / pause (Mantra step only) — breathing glow + L/R EQ bars */}
+              {step?.key === 'mantra' && (
                 <View style={styles.playRow}>
+                  <View style={styles.eqClusterLeft}>
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <Animated.View
+                        key={`eql-${i}`}
+                        style={[
+                          styles.eqBar,
+                          i > 0 && {marginLeft: EQ_BAR_GAP},
+                          {
+                            opacity: EQ_OPACITY,
+                            height: eqBarValuesRef.current[i].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [0, EQ_BAR_MAX_PX],
+                            }),
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
                   <View style={styles.playColumn}>
                     {isLoadingAudio ? (
                       <View style={styles.playOuter}>
@@ -555,33 +590,7 @@ export default function StepFlowScreen({navigation, route}) {
                       <View style={styles.playOuter}>
                         <Animated.View
                           pointerEvents="none"
-                          style={[
-                            styles.pulseRing,
-                            {
-                              opacity: pulseRingOpacity,
-                              transform: [{scale: pulseRingScale}],
-                            },
-                          ]}
-                        />
-                        <Animated.View
-                          pointerEvents="none"
-                          style={[
-                            styles.pulseRing,
-                            {
-                              opacity: pulseRingOpacity2,
-                              transform: [{scale: pulseRingScale2}],
-                            },
-                          ]}
-                        />
-                        <Animated.View
-                          pointerEvents="none"
-                          style={[
-                            styles.clickRipple,
-                            {
-                              opacity: clickRippleOpacity,
-                              transform: [{scale: clickRippleScale}],
-                            },
-                          ]}
+                          style={[styles.playGlow, {opacity: glowOpacity}]}
                         />
                         <Pressable
                           onPress={handlePlayPress}
@@ -601,29 +610,31 @@ export default function StepFlowScreen({navigation, route}) {
                       </View>
                     )}
                   </View>
-                  <View
-                    style={styles.waveformSlot}
-                    onLayout={e => {
-                      const w = Math.floor(e.nativeEvent.layout.width);
-                      if (w > 0 && w !== waveformWidth) {
-                        setWaveformWidth(w);
-                      }
-                    }}>
-                    {waveformWidth > 0 && (
-                      <AudioWaveformLine
-                        isPlaying={isPlaying && !isLoadingAudio}
-                        width={waveformWidth}
-                        height={DIMENSIONS.verticalScale(44)}
-                        strokeColor="#2E6C94"
-                        strokeWidth={2}
+                  <View style={styles.eqClusterRight}>
+                    {[5, 6, 7, 8, 9].map(i => (
+                      <Animated.View
+                        key={`eqr-${i}`}
+                        style={[
+                          styles.eqBar,
+                          i > 5 && {marginLeft: EQ_BAR_GAP},
+                          {
+                            opacity: EQ_OPACITY,
+                            height: eqBarValuesRef.current[i].interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [0, EQ_BAR_MAX_PX],
+                            }),
+                          },
+                        ]}
                       />
-                    )}
+                    ))}
                   </View>
                 </View>
               )}
 
               <Text style={styles.ctaHint}>
-                {isLast ? 'Tap below to return to menu' : 'Tap Next below to continue'}
+                {isLast
+                  ? 'Tap below to return to menu'
+                  : 'Tap → below to continue'}
               </Text>
             </Animated.View>
           </ScrollView>
@@ -678,37 +689,58 @@ const styles = StyleSheet.create({
   },
   stepIndex: {
     color: '#2B6AA8',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
     marginBottom: DIMENSIONS.verticalScale(6),
   },
   stepTitle: {
     color: '#2E6C94',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.moderateScale(20),
     marginBottom: DIMENSIONS.verticalScale(6),
   },
+  stepTextOuter: {
+    width: '100%',
+    marginBottom: DIMENSIONS.verticalScale(18),
+  },
   stepText: {
     color: '#111827',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.moderateScale(18),
+    lineHeight: Math.round(DIMENSIONS.moderateScale(18) * 1.45),
     textAlign: 'center',
-    marginBottom: DIMENSIONS.verticalScale(18),
   },
   playRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
     marginBottom: DIMENSIONS.verticalScale(12),
+    paddingHorizontal: DIMENSIONS.moderateScale(4),
+  },
+  eqClusterLeft: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+    width: DIMENSIONS.moderateScale(80),
+    height: EQ_BAR_MAX_PX + 2,
+    marginRight: DIMENSIONS.moderateScale(6),
+  },
+  eqClusterRight: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+    width: DIMENSIONS.moderateScale(80),
+    height: EQ_BAR_MAX_PX + 2,
+    marginLeft: DIMENSIONS.moderateScale(6),
+  },
+  eqBar: {
+    width: EQ_BAR_WIDTH,
+    borderRadius: 2,
+    backgroundColor: '#5BA3D4',
   },
   playColumn: {
     flexShrink: 0,
-  },
-  waveformSlot: {
-    flex: 1,
-    minHeight: DIMENSIONS.verticalScale(44),
-    marginLeft: DIMENSIONS.moderateScale(12),
-    justifyContent: 'center',
   },
   playOuter: {
     width: DIMENSIONS.moderateScale(160),
@@ -720,23 +752,17 @@ const styles = StyleSheet.create({
     zIndex: 2,
     elevation: 6,
   },
-  pulseRing: {
+  playGlow: {
     position: 'absolute',
-    width: DIMENSIONS.moderateScale(66),
-    height: DIMENSIONS.moderateScale(66),
-    borderRadius: DIMENSIONS.moderateScale(33),
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.92)',
-    backgroundColor: 'transparent',
-  },
-  clickRipple: {
-    position: 'absolute',
-    width: DIMENSIONS.moderateScale(66),
-    height: DIMENSIONS.moderateScale(66),
-    borderRadius: DIMENSIONS.moderateScale(33),
-    borderWidth: 2,
-    borderColor: 'rgba(142,198,234,0.95)',
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    width: DIMENSIONS.moderateScale(124),
+    height: DIMENSIONS.moderateScale(124),
+    borderRadius: DIMENSIONS.moderateScale(62),
+    backgroundColor: 'rgba(142, 198, 234, 0.95)',
+    shadowColor: '#5BA3D4',
+    shadowOpacity: 0.55,
+    shadowRadius: 20,
+    shadowOffset: {width: 0, height: 0},
+    elevation: 12,
   },
   playBtn: {
     width: DIMENSIONS.moderateScale(66),
@@ -760,7 +786,7 @@ const styles = StyleSheet.create({
   },
   ctaText: {
     color: '#FFFFFF',
-    fontWeight: '800',
+    fontWeight: '600',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
   },
   ctaHint: {
@@ -780,7 +806,7 @@ const styles = StyleSheet.create({
   blockerText: {
     color: '#fff',
     marginTop: 10,
-    fontWeight: '700',
+    fontWeight: '500',
     fontSize: 16,
   },
 

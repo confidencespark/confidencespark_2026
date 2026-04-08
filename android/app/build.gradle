@@ -99,10 +99,12 @@ android {
             keyPassword 'android'
         }
         release {
-            storeFile file(MYAPP_UPLOAD_STORE_FILE)
-            storePassword MYAPP_UPLOAD_STORE_PASSWORD
-            keyAlias MYAPP_UPLOAD_KEY_ALIAS
-            keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+            // Must use project.findProperty — bare MYAPP_* resolves on SigningConfig, not gradle.properties
+            def store = project.findProperty('MYAPP_UPLOAD_STORE_FILE') ?: 'app-upload.keystore'
+            storeFile file(store)
+            storePassword project.findProperty('MYAPP_UPLOAD_STORE_PASSWORD') ?: ''
+            keyAlias project.findProperty('MYAPP_UPLOAD_KEY_ALIAS') ?: ''
+            keyPassword project.findProperty('MYAPP_UPLOAD_KEY_PASSWORD') ?: ''
         }
         // For local dev when release keystore doesn't exist
         releaseDebugSigning {
@@ -117,8 +119,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Use debug signing for local dev when release keystore doesn't exist
-            def releaseKeystore = file(MYAPP_UPLOAD_STORE_FILE)
+            def storePath = project.findProperty('MYAPP_UPLOAD_STORE_FILE') ?: 'app-upload.keystore'
+            def releaseKeystore = file(storePath)
             signingConfig releaseKeystore.exists() ? signingConfigs.release : signingConfigs.releaseDebugSigning
             // minifyEnabled enableProguardInReleaseBuilds
             minifyEnabled false
