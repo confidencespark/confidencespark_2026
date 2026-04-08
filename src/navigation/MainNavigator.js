@@ -39,20 +39,6 @@ const MainNavigator = () => {
         name="MoodSelectScreen"
         component={MoodSelectScreen}
       />
-      <Stack.Screen
-        options={{
-          animation: 'fade',
-        }}
-        name="ConfirmSituationScreen"
-        component={ConfirmSituationScreen}
-      />
-      <Stack.Screen
-        options={{
-          animation: 'fade',
-        }}
-        name="StepFlowScreen"
-        component={StepFlowScreen}
-      />
     </Stack.Navigator>
   );
 };
