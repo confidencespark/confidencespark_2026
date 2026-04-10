@@ -53,7 +53,7 @@ export default function UserBottomTab() {
         tabBarInactiveTintColor: INACT,
 
         tabBarLabelStyle: {
-          fontWeight: '400',
+          fontWeight: '500',
           fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
         },
         tabBarItemStyle: {
@@ -153,3 +153,4 @@ export default function UserBottomTab() {
 }
 
 const styles = StyleSheet.create({});
+// ConfidenceSpark workspace batch

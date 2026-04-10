@@ -8,7 +8,15 @@
  */
 import {supabase} from './supabase';
 import {mergePdfStepTextsIntoKit} from '@constants/kitStepTexts/mergeKitStepTexts';
-import {getStepHeroUrls} from '@constants/stepHeroImages';
+
+const STEP_IMAGES = {
+  mantra: 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800&q=80&auto=format&fit=crop',
+  body: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80&auto=format&fit=crop',
+  grounding: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80&auto=format&fit=crop',
+  reframe: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800&q=80&auto=format&fit=crop',
+  ritual: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80&auto=format&fit=crop',
+  bonus: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&q=80&auto=format&fit=crop',
+};
 
 /** Convert Google Drive view URL to direct download URL for mobile playback */
 function toDirectAudioUrl(url) {
@@ -20,30 +28,21 @@ function toDirectAudioUrl(url) {
 
 /**
  * Transform kit row from Supabase into app-shaped response
- * @param {string} situationKey - request key (daily, pitch, …) for step hero art
- * @param {string} vibeKey - request key (any, calm, power, playful)
  */
-function kitToAppShape(kit, situation, vibe, situationKey, vibeKey) {
+function kitToAppShape(kit, situation, vibe) {
   if (!kit) return null;
   const rawAudio = kit.voice_audio_url || '';
-  const sk = situationKey || 'daily';
-  const vk = vibeKey || 'any';
-  const hero = getStepHeroUrls(sk, vk);
   return {
     kit_name: kit.kit_name,
     kit_audio: toDirectAudioUrl(rawAudio) || rawAudio,
     _situation_sc: situation ? [{name: situation.title}] : [],
     _vibes_sc: vibe ? [{title: vibe.title}] : [],
-    _mantra_sc: [{quote: kit.mantra, mantra_step_image: {url: hero.mantra}}],
-    _body_reset_sc: [{quote: kit.body_reset, bodyreset_step_images: {url: hero.body}}],
-    _grounding_belief_sc: [
-      {quote: kit.grounding_belief, groundingbelief_step_image: {url: hero.grounding}},
-    ],
-    _mental_reframe_sc: [
-      {quote: kit.mental_reframe, mentalreframe_step_image: {url: hero.reframe}},
-    ],
-    _ending_ritual_sc: [{quote: kit.ending_ritual, endingritual_step_image: {url: hero.ritual}}],
-    _bonus_tip_sc: [{quote: kit.bonus_tip, bonustip_step_image: {url: hero.bonus}}],
+    _mantra_sc: [{quote: kit.mantra, mantra_step_image: {url: STEP_IMAGES.mantra}}],
+    _body_reset_sc: [{quote: kit.body_reset, bodyreset_step_images: {url: STEP_IMAGES.body}}],
+    _grounding_belief_sc: [{quote: kit.grounding_belief, groundingbelief_step_image: {url: STEP_IMAGES.grounding}}],
+    _mental_reframe_sc: [{quote: kit.mental_reframe, mentalreframe_step_image: {url: STEP_IMAGES.reframe}}],
+    _ending_ritual_sc: [{quote: kit.ending_ritual, endingritual_step_image: {url: STEP_IMAGES.ritual}}],
+    _bonus_tip_sc: [{quote: kit.bonus_tip, bonustip_step_image: {url: STEP_IMAGES.bonus}}],
   };
 }
 
@@ -89,9 +88,7 @@ async function lookupBySituationAndVibe(situationKey, vibeKey) {
     .eq('vibe_id', vibe.id)
     .single();
 
-  return kit
-    ? kitToAppShape(kit, kit.situations, kit.vibes, situationKey, vibeKey)
-    : null;
+  return kit ? kitToAppShape(kit, kit.situations, kit.vibes) : null;
 }
 
 export const confidenceService = {
@@ -139,7 +136,7 @@ export const confidenceService = {
         .limit(1)
         .single();
       if (first) {
-        const shaped = kitToAppShape(first, first.situations, first.vibes, sk, vk);
+        const shaped = kitToAppShape(first, first.situations, first.vibes);
         return mergePdfStepTextsIntoKit(shaped, sk, vk);
       }
       return null;
@@ -182,3 +179,4 @@ function moodToKey(m) {
   };
   return m2[m] || m.toLowerCase().replace(/\s+/g, '_');
 }
+// ConfidenceSpark workspace batch

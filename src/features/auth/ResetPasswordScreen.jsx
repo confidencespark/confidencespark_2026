@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_TITLE,
-    fontWeight: '600',
+    fontWeight: '800',
     color: '#111827',
     marginTop: DIMENSIONS.verticalScale(6),
   },
@@ -268,13 +268,14 @@ const styles = StyleSheet.create({
   btnText: {
     color: '#FFFFFF',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
-    fontWeight: '500',
+    fontWeight: '700',
   },
 
   backWrap: {alignItems: 'center', marginTop: DIMENSIONS.verticalScale(14)},
   backLink: {
     color: '#2E6C94',
-    fontWeight: '600',
+    fontWeight: '800',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
   },
 });
+// ConfidenceSpark workspace batch

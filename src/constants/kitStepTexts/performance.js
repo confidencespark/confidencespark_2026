@@ -165,9 +165,10 @@ Go with it.`,
     bonusTip: `Stay here for a few extra seconds.
 Take a slow breath in, and as you exhale, let the corners of your mouth lift, just enough to feel it.
 That small smile signals ease in your body and warmth in the room.
-Picture your message landing like a spark curious eyes, softened shoulders, quiet laughter.
+Picture your message landing like a spark — curious eyes, softened shoulders, quiet laughter.
 This is about allowing joy.
 Lightness lowers tension, deepens connection, and helps your words stay with them.
 Joy allows authority to land with warmth and ease.`,
   },
 };
+// ConfidenceSpark workspace batch

@@ -56,3 +56,4 @@ if (isWindows) {
   });
   process.exit(runResult.status ?? 1);
 }
+// ConfidenceSpark workspace batch

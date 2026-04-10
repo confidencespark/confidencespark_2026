@@ -1,5 +1,5 @@
 // src/features/mood/MoodSelectScreen.jsx
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -9,26 +9,18 @@ import {
   Pressable,
   Image,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 
 import {DIMENSIONS} from '@constants/dimensions';
+import {navigate} from '@utils/NavigationUtils';
 import {PersistentBottomNav, PERSISTENT_NAV_HEIGHT} from '@components/ui/PersistentBottomNav';
-import {useEditMoodMutation, useConfidenceLookupMutation} from '@store/api/confidenceApi';
-import {navigateToConfidenceStepFlow} from '@utils/confidenceStepFlow';
 import {FadeInView} from '@components/ui/FadeInView';
 // import {COLORS} from '@constants/colors';
 
 const calm_hero = require('@assets/images/Calm_Grounded.png');
 const pumped_hero = require('@assets/images/Pumped_Powerful.png');
 const playful_hero = require('@assets/images/Playful_Loose.png');
-
-const MOOD_API_TITLES = {
-  calm: 'Calm & Grounded',
-  power: 'Pumped & Powerful',
-  playful: 'Playful & Loose',
-};
 
 const MOODS = [
   {
@@ -63,37 +55,29 @@ const MOODS = [
  *
  * Logic:
  * - Maps the selected mood to a theme (color/image).
- * - Confirms mood via API, fetches kit, opens `StepFlowScreen` (skips ConfirmVibe + Lookup).
+ * - Passes the selection to `ConfirmVibeScreen`.
  */
 export default function MoodSelectScreen({navigation, route}) {
   const insets = useSafeAreaInsets();
   const frozenBottom = React.useRef(insets.bottom || 0).current;
-  const [editMood] = useEditMoodMutation();
-  const [confidenceLookup] = useConfidenceLookupMutation();
-  const [flowLoading, setFlowLoading] = useState(false);
 
   const {situationTitle, title} = route?.params || {};
   const displayTitle = situationTitle || title || 'Moment';
 
-  const onPick = async mood => {
-    const situationKey = route?.params?.key;
-    const vibeKey = mood.key;
-    setFlowLoading(true);
-    try {
-      try {
-        await editMood({
-          mood: MOOD_API_TITLES[mood.key] || mood.title,
-          confidence_id: 0,
-        }).unwrap();
-      } catch (error) {
-        console.log('editMood (offline)', error);
-      }
-      const unwrapLookup = body => confidenceLookup(body).unwrap();
-      await navigateToConfidenceStepFlow(unwrapLookup, situationKey, vibeKey);
-    } finally {
-      setFlowLoading(false);
-    }
+  const onPick = mood => {
+    navigate('Main', {
+      screen: 'ConfirmVibeScreen',
+      params: {
+        situationKey: route?.params?.key,
+        mood: mood.key,
+        situationTitle: displayTitle,
+      },
+    });
   };
+  // navigation?.navigate?.('ConfirmVibe', {
+  //   mood: mood.key,
+  //   situationTitle,
+  // });
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
@@ -136,13 +120,7 @@ export default function MoodSelectScreen({navigation, route}) {
               {backgroundColor: item.bg},
               pressed && Platform.OS === 'ios' ? {opacity: 0.9} : null,
             ]}>
-            <View style={styles.thumbWrap}>
-              <Image
-                source={item.image}
-                style={styles.thumbImage}
-                resizeMode="cover"
-              />
-            </View>
+            <Image source={item.image} style={styles.thumb} />
             <Text style={styles.cardTitle}>{item.title}</Text>
           </Pressable>
           </FadeInView>
@@ -150,22 +128,12 @@ export default function MoodSelectScreen({navigation, route}) {
       </ScrollView>
 
       <PersistentBottomNav navigation={navigation} showNext={false} />
-
-      {flowLoading && (
-        <View style={styles.blocker} pointerEvents="auto">
-          <ActivityIndicator size="large" color="#ffffff" />
-          <Text style={styles.blockerText}>
-            Preparing your session…
-          </Text>
-        </View>
-      )}
     </SafeAreaView>
   );
 }
 
 const CARD_H = DIMENSIONS.verticalScale(92);
-const THUMB = DIMENSIONS.moderateScale(80);
-const THUMB_RADIUS = DIMENSIONS.moderateScale(10);
+const R = DIMENSIONS.moderateScale(22);
 
 const styles = StyleSheet.create({
   safe: {
@@ -190,7 +158,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: DIMENSIONS.moderateScale(28),
     lineHeight: DIMENSIONS.moderateScale(34),
-    fontWeight: '600',
+    fontWeight: '800',
     color: '#2E6C94',
     marginTop: DIMENSIONS.MARGIN_LARGE,
   },
@@ -199,9 +167,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: CARD_H,
-    borderRadius: THUMB_RADIUS,
+    borderRadius: R,
     paddingHorizontal: DIMENSIONS.moderateScale(18),
-    paddingVertical: DIMENSIONS.moderateScale(18),
+    // paddingVertical: DIMENSIONS.moderateScale(30),
 
     marginTop: DIMENSIONS.verticalScale(16),
 
@@ -209,35 +177,17 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth * 2,
     borderColor: 'rgba(0,0,0,0.06)',
   },
-  thumbWrap: {
-    width: THUMB,
-    height: THUMB,
-    borderRadius: THUMB_RADIUS,
+  thumb: {
+    width: DIMENSIONS.moderateScale(80),
+    height: DIMENSIONS.moderateScale(80),
+    borderRadius: DIMENSIONS.moderateScale(10),
     marginRight: DIMENSIONS.moderateScale(16),
-    overflow: 'hidden',
-    alignSelf: 'center',
-  },
-  thumbImage: {
-    width: THUMB,
-    height: THUMB,
   },
   cardTitle: {
     flex: 1,
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
-    fontWeight: '600',
+    fontWeight: '800',
     color: '#111827',
   },
-
-  blocker: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  blockerText: {
-    color: '#fff',
-    marginTop: 10,
-    fontWeight: '500',
-    fontSize: 16,
-  },
 });
+// ConfidenceSpark workspace batch

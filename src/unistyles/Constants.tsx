@@ -51,3 +51,4 @@ export const darkWeatherColors = [
   'rgba(54, 67, 92, 0.2)',
   'rgba(54, 67, 92, 0.0)',
 ];
+// ConfidenceSpark workspace batch

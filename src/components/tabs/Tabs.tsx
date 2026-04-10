@@ -74,7 +74,7 @@ const Tabs = ({selectedCategory, categories, onCategoryPress}) => {
                 <CustomText
                   fontSize={RFValue(9)}
                   style={[
-                    {textAlign: 'center', fontWeight: '400'},
+                    {textAlign: 'center', fontWeight: '500'},
                     selectedCategory?._id == category?._id && {
                       color: Colors.active,
                     },
@@ -140,3 +140,4 @@ const styles = StyleSheet.create({
 });
 
 export default Tabs;
+// ConfidenceSpark workspace batch

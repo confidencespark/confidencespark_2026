@@ -21,3 +21,4 @@ export const KIT_STEP_TEXTS = {
   presentation: presentationSteps,
   difficult: difficultSteps,
 };
+// ConfidenceSpark workspace batch

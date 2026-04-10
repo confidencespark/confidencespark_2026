@@ -69,7 +69,7 @@ const CurvedBackground = ({text}) => {
 const styles = StyleSheet.create({
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_TITLE,
-    fontWeight: '600',
+    fontWeight: '800',
     color: COLORS.white,
     marginTop: DIMENSIONS.verticalScale(6),
   },
@@ -103,3 +103,4 @@ const styles = StyleSheet.create({
 });
 
 export default CurvedBackground;
+// ConfidenceSpark workspace batch

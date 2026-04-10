@@ -22,3 +22,4 @@ if %USE_KEEPDEPFILE%==1 (
 ) else (
   "%NINJA_EXE%" %*
 )
+rem ConfidenceSpark workspace batch

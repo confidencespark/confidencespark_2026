@@ -152,3 +152,7 @@ npm run ios
 3.  Select "Any iOS Device (arm64)".
 4.  Go to **Product -> Archive**.
 5.  Follow the organizer steps to upload to TestFlight/App Store Connect.
+
+---
+
+ConfidenceSpark workspace batch.

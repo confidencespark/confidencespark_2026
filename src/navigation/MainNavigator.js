@@ -4,6 +4,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import IntroScreen from '@features/intro/IntroScreen';
 import MoodSelectScreen from '@features/main/MoodSelectScreen';
 import ConfirmSituationScreen from '@features/main/ConfirmSituationScreen';
+import ConfirmVibeScreen from '@features/main/ConfirmVibeScreen';
+import LookupScreen from '@features/main/LookupScreen';
 import StepFlowScreen from '@features/main/StepFlowScreen';
 import HomeScreen from '@features/main/home/HomeScreen';
 
@@ -39,8 +41,37 @@ const MainNavigator = () => {
         name="MoodSelectScreen"
         component={MoodSelectScreen}
       />
+      <Stack.Screen
+        options={{
+          animation: 'fade',
+        }}
+        name="ConfirmSituationScreen"
+        component={ConfirmSituationScreen}
+      />
+      <Stack.Screen
+        options={{
+          animation: 'fade',
+        }}
+        name="ConfirmVibeScreen"
+        component={ConfirmVibeScreen}
+      />
+      <Stack.Screen
+        options={{
+          animation: 'fade',
+        }}
+        name="LookupScreen"
+        component={LookupScreen}
+      />
+      <Stack.Screen
+        options={{
+          animation: 'fade',
+        }}
+        name="StepFlowScreen"
+        component={StepFlowScreen}
+      />
     </Stack.Navigator>
   );
 };
 
 export default MainNavigator;
+// ConfidenceSpark workspace batch

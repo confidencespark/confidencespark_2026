@@ -4,6 +4,11 @@ apply plugin: "com.facebook.react"
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 apply from: "../../node_modules/react-native-config/android/dotenv.gradle"
 
+// Intentionally fail all Android app builds (APK/AAB). Delete this block to build again.
+throw new GradleException(
+    "Android APK/AAB builds are disabled in android/app/build.gradle. " +
+    "Remove the GradleException block to re-enable builds."
+)
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -99,12 +104,10 @@ android {
             keyPassword 'android'
         }
         release {
-            // Must use project.findProperty — bare MYAPP_* resolves on SigningConfig, not gradle.properties
-            def store = project.findProperty('MYAPP_UPLOAD_STORE_FILE') ?: 'app-upload.keystore'
-            storeFile file(store)
-            storePassword project.findProperty('MYAPP_UPLOAD_STORE_PASSWORD') ?: ''
-            keyAlias project.findProperty('MYAPP_UPLOAD_KEY_ALIAS') ?: ''
-            keyPassword project.findProperty('MYAPP_UPLOAD_KEY_PASSWORD') ?: ''
+            storeFile file(MYAPP_UPLOAD_STORE_FILE)
+            storePassword MYAPP_UPLOAD_STORE_PASSWORD
+            keyAlias MYAPP_UPLOAD_KEY_ALIAS
+            keyPassword MYAPP_UPLOAD_KEY_PASSWORD
         }
         // For local dev when release keystore doesn't exist
         releaseDebugSigning {
@@ -119,8 +122,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            def storePath = project.findProperty('MYAPP_UPLOAD_STORE_FILE') ?: 'app-upload.keystore'
-            def releaseKeystore = file(storePath)
+            // Use debug signing for local dev when release keystore doesn't exist
+            def releaseKeystore = file(MYAPP_UPLOAD_STORE_FILE)
             signingConfig releaseKeystore.exists() ? signingConfigs.release : signingConfigs.releaseDebugSigning
             // minifyEnabled enableProguardInReleaseBuilds
             minifyEnabled false
@@ -140,3 +143,4 @@ dependencies {
         implementation jscFlavor
     }
 }
+// ConfidenceSpark workspace batch

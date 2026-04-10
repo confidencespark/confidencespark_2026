@@ -68,3 +68,7 @@ npm run ios
 ## 5. Audio URLs
 
 The seed script includes Google Drive links for kit voiceovers from the PDF. If you need to use direct MP3 URLs instead, update the `voice_audio_url` column in the `kits` table via Supabase dashboard or a migration.
+
+---
+
+ConfidenceSpark workspace batch.

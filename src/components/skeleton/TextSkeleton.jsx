@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 
-// export function TextSkeleton({width = 120, height = 20, borderRadius = 6}) {
+export function TextSkeleton({width = 120, height = 20, borderRadius = 6}) {
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -36,3 +36,4 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
 });
+// ConfidenceSpark workspace batch

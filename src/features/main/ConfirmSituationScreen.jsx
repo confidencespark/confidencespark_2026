@@ -7,14 +7,12 @@ import {
   StyleSheet,
   StatusBar,
   ScrollView,
-  Platform,
 } from 'react-native';
 import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DIMENSIONS} from '@constants/dimensions';
 import {navigate} from '@utils/NavigationUtils';
 import {PersistentBottomNav, PERSISTENT_NAV_HEIGHT} from '@components/ui/PersistentBottomNav';
 import {FadeInView} from '@components/ui/FadeInView';
-import HeroCometBorder from '@components/ui/HeroCometBorder';
 import {useEditSituationMutation} from '@store/api/confidenceApi';
 
 /**
@@ -35,12 +33,9 @@ export default function ConfirmSituationScreen({navigation, route}) {
     title = 'Interview',
     subtitle = 'You’re not here to impress.\nyou’re here to connect.',
     image = {
-      // fit=max (not crop) so the downloaded bitmap is uncropped; contain then shows all of it
-      uri: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=800&auto=format&fit=max',
+      uri: 'https://images.unsplash.com/photo-1521119989659-a83eee488004?q=80&w=800&auto=format&fit=crop',
     },
   } = route?.params || {};
-
-  const heroRadius = DIMENSIONS.moderateScale(12);
 
   const onProceed = async () => {
     // if this lives under Main stack:
@@ -80,22 +75,7 @@ export default function ConfirmSituationScreen({navigation, route}) {
         keyboardShouldPersistTaps="handled">
         <View style={styles.body}>
           <FadeInView delay={0} duration={350}>
-            <HeroCometBorder
-              width={HERO}
-              height={HERO}
-              borderRadius={heroRadius}
-              cometSize={DIMENSIONS.moderateScale(7) * 2.4}
-              color="#A5D4ED"
-              orbitDurationMs={11000}
-              speed={1}
-              style={styles.heroWrap}>
-              <Image
-                source={image}
-                style={styles.heroImage}
-                resizeMode="cover"
-                {...(Platform.OS === 'android' ? {resizeMethod: 'resize'} : {})}
-              />
-            </HeroCometBorder>
+            <Image source={image} style={styles.hero} />
           </FadeInView>
 
           <Text style={styles.title}>{title}</Text>
@@ -103,7 +83,7 @@ export default function ConfirmSituationScreen({navigation, route}) {
           <Text style={styles.subtitle}>{subtitle}</Text>
 
           <Text style={styles.helper}>
-            Tap → below to{'\n'}select the vibe
+            Tap Next below to{'\n'}select the vibe
           </Text>
         </View>
       </ScrollView>
@@ -148,27 +128,25 @@ const styles = StyleSheet.create({
     paddingTop: DIMENSIONS.verticalScale(22), // big top white space
   },
 
-  heroWrap: {
-    marginBottom: DIMENSIONS.verticalScale(22),
-  },
-  /** Fills square hero (no letterboxing); edges may crop vs intrinsic aspect */
-  heroImage: {
+  hero: {
     width: HERO,
     height: HERO,
+    borderRadius: DIMENSIONS.moderateScale(12),
+    marginBottom: DIMENSIONS.verticalScale(22), // space before title
   },
 
   title: {
     textAlign: 'center',
     fontSize: DIMENSIONS.moderateScale(28),
     lineHeight: DIMENSIONS.moderateScale(34),
-    fontWeight: '600',
+    fontWeight: '800',
     color: '#2E6C94',
     marginBottom: DIMENSIONS.verticalScale(14), // space before subtitle
   },
   subtitle: {
     textAlign: 'center',
     color: '#2B2B2B',
-    fontWeight: '400',
+    fontWeight: '600',
     fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
     lineHeight: DIMENSIONS.FONT_SIZE_MEDIUM * 1.45,
     marginBottom: DIMENSIONS.verticalScale(36), // larger gap like mock
@@ -191,7 +169,8 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontWeight: '800',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
   },
 });
+// ConfidenceSpark workspace batch

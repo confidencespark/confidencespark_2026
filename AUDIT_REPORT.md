@@ -105,3 +105,7 @@ Run a manual pass on device/emulator to confirm:
 3. Home → Interview → ConfirmSituation → MoodSelect → ConfirmVibe → LookupScreen → StepFlowScreen.
 4. Back and Home buttons in each flow.
 5. Step images and hero display.
+
+---
+
+ConfidenceSpark workspace batch.

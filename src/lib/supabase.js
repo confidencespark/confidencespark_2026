@@ -13,3 +13,4 @@ const supabaseAnonKey = Config.SUPABASE_ANON_KEY || '';
 export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
+// ConfidenceSpark workspace batch

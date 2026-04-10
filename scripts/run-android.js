@@ -20,3 +20,4 @@ if (isWindows) {
   const result = spawnSync('npx', ['react-native', 'run-android'], { stdio: 'inherit' });
   process.exit(result.status ?? 1);
 }
+// ConfidenceSpark workspace batch

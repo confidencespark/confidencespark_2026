@@ -149,7 +149,7 @@ You're activating with ease… and a little spark.`,
 
     mentalReframe: `Let your attention settle right here.
 Take a slow breath in, and as you exhale, feel your shoulders settle into ease.
-Notice the steady support beneath you the floor holding your feet, your hands resting with ease.
+Notice the steady support beneath you — the floor holding your feet, your hands resting with ease.
 Picture this moment as it is: clear, stable, open.
 Let that calm rise gently through your body, into your chest, into your voice, into your focus.
 This is presence.
@@ -190,3 +190,4 @@ Any time you repeat this cue, your body knows what to do.
 You've been here before and it's available now.`,
   },
 };
+// ConfidenceSpark workspace batch

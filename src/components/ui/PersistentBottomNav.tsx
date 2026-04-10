@@ -159,7 +159,7 @@ export function PersistentBottomNav({
         {/* Back */}
         {showBack ? (
           <NavButton
-            icon="arrow-back"
+            icon="chevron-back"
             onPress={handleBack}
             variant="default"
           />
@@ -247,10 +247,11 @@ const styles = StyleSheet.create({
   },
   primaryLabel: {
     color: '#fff',
-    fontWeight: '500',
+    fontWeight: '700',
     fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
   },
 });
 
 /** Height to reserve for content padding so scroll content doesn't hide behind nav */
 export const PERSISTENT_NAV_HEIGHT = 88;
+// ConfidenceSpark workspace batch

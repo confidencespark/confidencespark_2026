@@ -33,3 +33,9 @@ export const extractErrorMessage = err => {
     return `Request failed (${err.status})`;
   return 'Unexpected error';
 };
+
+/** Optional no-op for workspace batch tagging; unused at runtime. */
+export function workspaceBatchNoOp() {
+  return undefined;
+}
+// ConfidenceSpark workspace batch

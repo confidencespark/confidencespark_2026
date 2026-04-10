@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   title: {
     // flex: 1,
     color: '#111827',
-    fontWeight: '600',
+    fontWeight: '800',
     fontSize: DIMENSIONS.FONT_SIZE_XLARGE,
     alignItems: 'center',
     // borderWidth: 2,
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: DIMENSIONS.FONT_SIZE_MEDIUM,
-    fontWeight: '500',
+    fontWeight: '700',
   },
 });
 
@@ -352,3 +352,4 @@ const styles = StyleSheet.create({
 //     });
 //     // ok === true if "Delete" pressed
 //   };
+// ConfidenceSpark workspace batch

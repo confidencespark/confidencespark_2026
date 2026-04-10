@@ -16,7 +16,7 @@ import Animated, {FadeInUp} from 'react-native-reanimated';
 
 // import { useNavigation } from '@react-navigation/native';
 
-import splashImg from '@assets/images/splash.jpg';
+import splashImg from '@assets/images/splash.png';
 import logoImg from '@assets/images/logo.png';
 
 import CustomButton from '@components/ui/CustomButton';
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: DIMENSIONS.FONT_SIZE_HEADER,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: COLORS.white,
     textAlign: 'center',
     marginBottom: DIMENSIONS.MARGIN_LARGE,
@@ -200,3 +200,4 @@ const styles = StyleSheet.create({
 });
 
 export default IntroScreen;
+// ConfidenceSpark workspace batch

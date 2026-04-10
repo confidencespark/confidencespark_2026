@@ -36,3 +36,4 @@ class MainApplication : Application(), ReactApplication {
     loadReactNative(this)
   }
 }
+// ConfidenceSpark workspace batch
