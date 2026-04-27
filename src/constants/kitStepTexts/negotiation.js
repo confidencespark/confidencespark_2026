@@ -56,7 +56,7 @@ Let the room breathe.
 That brief stillness gives you information, tone, timing, what matters most.
 Your next move forms more clearly in the quiet.
 "You don't get what you deserve, you get what you negotiate."
-— Chester L. Karrass
+— Chester\u00A0L.\u00A0Karrass
 Use silence on purpose.
 After a key point, pause.
 Let the room settle around your words.
@@ -185,4 +185,3 @@ Let that current move through you, clear, alive, directed.
 This energy works for you.`,
   },
 };
-// ConfidenceSpark workspace batch

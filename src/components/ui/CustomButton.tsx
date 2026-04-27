@@ -66,4 +66,3 @@ const styles = StyleSheet.create({
 });
 
 export default CustomButton;
-// ConfidenceSpark workspace batch

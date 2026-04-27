@@ -76,6 +76,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "_workspaceBatch": "ConfidenceSpark"
+  }
 }

@@ -23,4 +23,3 @@ export const preloadNextStepHero = (steps = [], index = 0) => {
     steps?.[index + 1]?.stepHero;
   if (next) preloadUrls([next]);
 };
-// ConfidenceSpark workspace batch

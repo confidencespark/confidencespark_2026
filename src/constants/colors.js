@@ -30,4 +30,3 @@ export const COLORS = {
   overlay: 'rgba(0, 0, 0, 0.5)',
   overlayLight: 'rgba(0, 0, 0, 0.3)',
 };
-// ConfidenceSpark workspace batch

@@ -54,4 +54,3 @@ Let it land, not as hype, but as memory.
 Each doorway is a micro rep of confidence.
 You're not waiting to feel it, you're building it.`,
 };
-// ConfidenceSpark workspace batch

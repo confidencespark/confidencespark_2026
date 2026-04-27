@@ -62,7 +62,3 @@ For development with hot reload:
 2. In another terminal: `npx react-native run-android --mode=debug`
 
 Then keep the Metro terminal open when using the app.
-
----
-
-ConfidenceSpark workspace batch.

@@ -54,4 +54,3 @@ export const DIMENSIONS = {
   FONT_SIZE_TITLE: moderateScale(24),
   FONT_SIZE_HEADER: moderateScale(32),
 };
-// ConfidenceSpark workspace batch

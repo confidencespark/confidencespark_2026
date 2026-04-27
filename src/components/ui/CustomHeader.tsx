@@ -81,4 +81,3 @@ const styles = StyleSheet.create({
   },
 });
 export default CustomHeader;
-// ConfidenceSpark workspace batch

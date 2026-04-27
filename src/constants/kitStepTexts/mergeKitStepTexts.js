@@ -46,4 +46,3 @@ export function mergePdfStepTextsIntoKit(data, situationKey, vibeKey) {
     _bonus_tip_sc: m(data._bonus_tip_sc, t.bonusTip),
   };
 }
-// ConfidenceSpark workspace batch

@@ -85,7 +85,3 @@ Replace current AI-looking images with consistent, human, calm illustrations. Us
 3. Replace `h_1.webp`–`h_6.webp` in `src/assets/images/`.
 4. Update `MOCK_CONFIDENCE_DATA` and API response mapping with final image URLs.
 5. Ensure step images are used consistently in `LookupScreen` and `StepFlowScreen`.
-
----
-
-ConfidenceSpark workspace batch.

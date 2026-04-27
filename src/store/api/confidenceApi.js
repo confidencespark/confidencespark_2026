@@ -61,4 +61,3 @@ export const {
   useEditMoodMutation,
   useConfidenceLookupMutation,
 } = confidenceApi;
-// ConfidenceSpark workspace batch

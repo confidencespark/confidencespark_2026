@@ -33,4 +33,3 @@ target 'ConfidenceCatalyst' do
     )
   end
 end
-# ConfidenceSpark workspace batch

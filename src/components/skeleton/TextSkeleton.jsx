@@ -36,4 +36,3 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
 });
-// ConfidenceSpark workspace batch

@@ -64,4 +64,3 @@ export default function ProgressiveHeroBg({
     </View>
   );
 }
-// ConfidenceSpark workspace batch

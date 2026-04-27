@@ -19,4 +19,3 @@ module.exports = {
     return ['ts', 'tsx', 'js', 'jsx'];
   },
 };
-// ConfidenceSpark workspace batch

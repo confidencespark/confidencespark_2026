@@ -28,4 +28,3 @@ const styles = StyleSheet.create({
 });
 
 export default CustomSafeAreaView;
-// ConfidenceSpark workspace batch

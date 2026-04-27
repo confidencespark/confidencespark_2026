@@ -185,4 +185,3 @@ export async function push(routeName: string, params?: object) {
 export async function prepareNavigation() {
   navigationRef.isReady();
 }
-// ConfidenceSpark workspace batch

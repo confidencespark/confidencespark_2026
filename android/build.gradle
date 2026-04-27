@@ -55,4 +55,3 @@ if (isWindows) {
 }
 
 apply plugin: "com.facebook.react.rootproject"
-// ConfidenceSpark workspace batch

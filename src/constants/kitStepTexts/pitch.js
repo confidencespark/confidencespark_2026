@@ -167,4 +167,3 @@ Presence builds trust faster than polish.
 — Maya Angelou`,
   },
 };
-// ConfidenceSpark workspace batch

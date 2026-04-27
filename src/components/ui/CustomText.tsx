@@ -106,4 +106,3 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
-// ConfidenceSpark workspace batch

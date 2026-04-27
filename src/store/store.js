@@ -22,4 +22,3 @@ export const store = configureStore({
       },
     }).concat(authApi.middleware, confidenceApi.middleware),
 });
-// ConfidenceSpark workspace batch

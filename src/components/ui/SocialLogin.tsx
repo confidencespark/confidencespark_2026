@@ -43,4 +43,3 @@ const SocialLogin: FC = () => {
 };
 
 export default SocialLogin;
-// ConfidenceSpark workspace batch

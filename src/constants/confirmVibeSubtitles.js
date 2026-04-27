@@ -1,5 +1,5 @@
 /**
- * Subtitle copy for ConfirmVibe + Lookup (same situation key × mood as MoodSelectScreen).
+ * Subtitle copy for mood × situation (same keys as MoodSelectScreen).
  */
 
 const SUBTITLE_BY_SITUATION_AND_VIBE = {
@@ -51,4 +51,3 @@ export function getConfirmVibeSubtitle(situationKey, moodKey) {
   const line = row && row[moodKey];
   return line || DEFAULT_CONFIRM_VIBE_SUBTITLE;
 }
-// ConfidenceSpark workspace batch

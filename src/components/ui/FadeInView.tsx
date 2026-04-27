@@ -53,4 +53,3 @@ export function FadeInView({
     </Animated.View>
   );
 }
-// ConfidenceSpark workspace batch

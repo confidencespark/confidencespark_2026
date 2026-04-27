@@ -108,4 +108,3 @@ export const loginStyles = createStyleSheet(({colors, device, border}) => ({
     fontSize: 10,
   },
 }));
-// ConfidenceSpark workspace batch

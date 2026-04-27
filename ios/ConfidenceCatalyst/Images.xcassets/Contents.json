@@ -1,7 +1,6 @@
 {
-  "info": {
-    "author": "xcode",
-    "version": 1
-  },
-  "_workspaceBatch": "ConfidenceSpark"
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
 }

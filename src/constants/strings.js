@@ -88,4 +88,3 @@ export const STRINGS = {
   PASSWORDS_DONT_MATCH: 'Passwords do not match',
   INVALID_PHONE: 'Please enter a valid phone number',
 };
-// ConfidenceSpark workspace batch

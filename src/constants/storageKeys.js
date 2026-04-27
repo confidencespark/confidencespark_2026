@@ -8,4 +8,3 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: '@auth_token',
   USER_EMAIL: '@user_email',
 };
-// ConfidenceSpark workspace batch

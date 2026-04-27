@@ -84,4 +84,3 @@ try {
     subst "${DriveLetter}:" /d
     Write-Host "Unmounted ${DriveLetter}:" -ForegroundColor Gray
 }
-# ConfidenceSpark workspace batch
